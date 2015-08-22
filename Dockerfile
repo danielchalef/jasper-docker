@@ -1,4 +1,4 @@
-FROM ubuntu:15.04
+FROM danielchalef/armhf-ubuntu-core:15.04
 MAINTAINER Daniel Chalef <daniel.chalef@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -7,12 +7,8 @@ RUN export JASPER_HOME=$JASPER_HOME
 
 RUN export THREADS=`getconf _NPROCESSORS_ONLN`
 
-ENV CCFLAGS "-mtune=native"
-#ENV CCFLAGS "-mtune=cortex-a7 -mfpu=neon-vfpv4"
-RUN export CCFLAGS=$CCFLAGS 
-RUN export CPPFLAGS=$CCFLAGS 
-
-#COPY compile-sirius-servers.sh.patch /tmp/
+RUN export CCFLAGS="-mtune=cortex-a7 -mfpu=neon-vfpv4"
+RUN export CPPFLAGS="-mtune=cortex-a7 -mfpu=neon-vfpv4"
 
 RUN apt-get update; apt-get upgrade -y
 
@@ -27,12 +23,12 @@ RUN echo \
 $'build-dir = /var/cache/apt-build/build \n\
 repository-dir = /var/cache/apt-build/repository \n\
 Olevel = -O3 \n\
-mtune = -mtune=native \n\
-options = " " \n\
-make_options = " -j8"' \
+mtune = -mtune=cortex-a7 \n\
+options = "" \n\
+make_options = " -j8 -mfpu=neon-vfpv4"' \
 > /etc/apt/apt-build.conf
 
-RUN TARGET=bulldozer apt-build install openblas
+RUN TARGET=ARMV7 apt-build install openblas
 
 RUN echo "options snd-usb-audio index=0" >> /etc/modprobe.d/alsa-base.conf
 
