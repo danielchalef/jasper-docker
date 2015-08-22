@@ -39,11 +39,11 @@ RUN cd cmuclmtk; sh ./autogen.sh && make -j4 && make install
 RUN wget http://distfiles.macports.org/openfst/openfst-1.3.3.tar.gz
 RUN wget https://mitlm.googlecode.com/files/mitlm-0.4.1.tar.gz
 RUN wget https://m2m-aligner.googlecode.com/files/m2m-aligner-1.2.tar.gz
-RUN wget https://phonetisaurus.googlecode.com/files/phonetisaurus-0.7.8.tgz
+RUN wget https://github.com/danielchalef/Phonetisaurus/archive/04242015.tar.gz # rescued from github repo prior to code disappearing?!?
 
 RUN tar -xvf m2m-aligner-1.2.tar.gz
 RUN tar -xvf openfst-1.3.3.tar.gz
-RUN tar -xvf phonetisaurus-0.7.8.tgz
+RUN tar -xvf 04242015.tar.gz
 RUN tar -xvf mitlm-0.4.1.tar.gz
 
 WORKDIR $JASPER_HOME/openfst-1.3.3/
@@ -57,12 +57,12 @@ WORKDIR $JASPER_HOME/mitlm-0.4.1/
 RUN ./configure
 RUN make
 
-WORKDIR $JASPER_HOME/phonetisaurus-0.7.8/src/
+WORKDIR $JASPER_HOME/04242015/src/
 RUN make
 
 WORKDIR $JASPER_HOME
 RUN cp m2m-aligner-1.2/m2m-aligner /usr/local/bin/m2m-aligner
-RUN cp phonetisaurus-0.7.8/phonetisaurus-g2p /usr/local/bin/phonetisaurus-g2p
+RUN cp 04242015/phonetisaurus-g2p /usr/local/bin/phonetisaurus-g2p
 
 RUN wget http://phonetisaurus.googlecode.com/files/g014b2b.tgz
 RUN tar -xvf g014b2b.tgz
