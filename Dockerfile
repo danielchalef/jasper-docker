@@ -28,6 +28,7 @@ RUN pip install --upgrade setuptools
 RUN CCFLAGS="$CCFLAGS" CPPFLAGS="$CCFLAGS" pip install -r $JASPER_HOME/client/requirements.txt
 RUN chmod +x $JASPER_HOME/jasper.py
 
+# Install PocketSphinx and Deps
 RUN apt-get install -y pocketsphinx-utils
 
 WORKDIR $JASPER_HOME
@@ -44,6 +45,29 @@ RUN tar -xvf m2m-aligner-1.2.tar.gz
 RUN tar -xvf openfst-1.3.3.tar.gz
 RUN tar -xvf phonetisaurus-0.7.8.tgz
 RUN tar -xvf mitlm-0.4.1.tar.gz
-#RUN add-apt-repository -y ppa:kirillshkrogalev/ffmpeg-next
 
-#RUN apt-add-repository -y multiverse
+WORKDIR $JASPER_HOME/openfst-1.3.3/
+RUN sudo ./configure --enable-compact-fsts --enable-const-fsts --enable-far --enable-lookahead-fsts --enable-pdt
+RUN make install
+
+WORKDIR $JASPER_HOME/m2m-aligner-1.2/
+RUN make 
+
+WORKDIR $JASPER_HOME/mitlm-0.4.1/
+RUN ./configure
+RUN make
+
+WORKDIR $JASPER_HOME/phonetisaurus-0.7.8/src/
+RUN make
+
+WORKDIR $JASPER_HOME
+RUN cp m2m-aligner-1.2/m2m-aligner /usr/local/bin/m2m-aligner
+RUN cp phonetisaurus-0.7.8/phonetisaurus-g2p /usr/local/bin/phonetisaurus-g2p
+
+RUN wget http://phonetisaurus.googlecode.com/files/g014b2b.tgz
+RUN tar -xvf g014b2b.tgz
+RUN cd g014b2b/ && ./compile-fst.sh
+RUN mv g014b2b phonetisaurus
+
+# Install deps for SVOX Pico TTS engine
+RUN apt-get install libttspico-utils
