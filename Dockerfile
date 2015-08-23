@@ -9,7 +9,7 @@ RUN export THREADS=`getconf _NPROCESSORS_ONLN`
 
 RUN export CCFLAGS="-mtune=cortex-a7 -mfpu=neon-vfpv4"; export CPPFLAGS="-mtune=cortex-a7 -mfpu=neon-vfpv4"
 
-RUN apt-get install software-properties-common
+RUN apt-get install -y software-properties-common
 # multiverse is needed for libttspico
 RUN apt-add-repository -y multiverse && apt-get update
 
