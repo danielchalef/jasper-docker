@@ -39,9 +39,9 @@ RUN make -j $THREADS TARGET=ARMV7 && make install
 RUN echo "/opt/OpenBLAS/lib" > /etc/ld.so.conf.d/openblas.conf && ldconfig
 RUN ln -s /opt/OpenBLAS/lib/libopenblas.so /usr/local/lib/libopenblas.so
 
+WORKDIR $JASPER_HOME
 # Build Python numpy. It will find OpenBLAS in /usr/local/lib and use for BLAS operations
-RUN pip install --upgrade setuptools
-RUN easy_install -U pip
+RUN wget https://bootstrap.pypa.io/get-pip.py && /usr/bin/python get-pip.py
 RUN pip install numpy
 
 RUN echo "options snd-usb-audio index=0" >> /etc/modprobe.d/alsa-base.conf
