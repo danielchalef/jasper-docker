@@ -7,37 +7,47 @@ RUN export JASPER_HOME=$JASPER_HOME
 
 RUN export THREADS=`getconf _NPROCESSORS_ONLN`
 
-RUN export CCFLAGS="-mtune=cortex-a7 -mfpu=neon-vfpv4"
-RUN export CPPFLAGS="-mtune=cortex-a7 -mfpu=neon-vfpv4"
+RUN export CCFLAGS="-mtune=cortex-a7 -mfpu=neon-vfpv4"; export CPPFLAGS="-mtune=cortex-a7 -mfpu=neon-vfpv4"
 
 RUN apt-get update; apt-get upgrade -y
 
 RUN apt-get install -y \
-	build-essential gcc-4.9 wget vim git-core python-dev python-pip apt-build\
+	build-essential wget vim git-core python-dev\
 	bison libasound2-dev libportaudio-dev python-pyaudio \
 	apt-utils alsa-base alsa-utils alsa-oss pulseaudio \
 	subversion autoconf libtool automake gfortran
 
+RUN easy_install -U pip
+
 # Optimised apt-build config which we'll use to compile OpenBLAS
-RUN echo \
-$'build-dir = /var/cache/apt-build/build \n\
-repository-dir = /var/cache/apt-build/repository \n\
-Olevel = -O3 \n\
-mtune = -mtune=cortex-a7 \n\
-options = " " \n\
-make_options = " -j8 -mfpu=neon-vfpv4"' \
-> /etc/apt/apt-build.conf
+#RUN echo \
+#$'build-dir = /var/cache/apt-build/build \n\
+#repository-dir = /var/cache/apt-build/repository \n\
+#Olevel = -O3 \n\
+#mtune = -mtune=cortex-a7 \n\
+#options = " " \n\
+#make_options = " -j8 -mfpu=neon-vfpv4"' \
+#> /etc/apt/apt-build.conf
 
-RUN cat /etc/apt/apt-build.conf
+#RUN TARGET=ARMV7 apt-build install openblas
 
-RUN TARGET=ARMV7 apt-build install openblas
+# Build optimized OpenBLAS from source. Ensure we use armv7 target. 
+# Unfortunately OpenBLAS does not yet use the cortex-a5's neon-vfpv4 instructions
+RUN git clone https://github.com/xianyi/OpenBLAS.git $JASPER_HOME/OpenBLAS 
+WORKDIR $JASPER_HOME/OpenBLAS
+RUN git checkout v0.2.14
+RUN make -j $THREADS TARGET=ARMV7 && make install
+RUN echo "/opt/OpenBLAS/lib" > /etc/ld.so.conf.d/openblas.conf && ldconfig
+
+# Build Python numpy and now use OpenBLAS for BLAS operations
+RUN pip install numpy
 
 RUN echo "options snd-usb-audio index=0" >> /etc/modprobe.d/alsa-base.conf
 
 RUN git clone https://github.com/jasperproject/jasper-client.git $JASPER_HOME
 
 RUN pip install --upgrade setuptools
-RUN CCFLAGS="$CCFLAGS" CPPFLAGS="$CCFLAGS" pip install -r $JASPER_HOME/client/requirements.txt
+RUN pip install -r $JASPER_HOME/client/requirements.txt
 RUN chmod +x $JASPER_HOME/jasper.py
 
 # Install PocketSphinx and Deps
@@ -58,8 +68,8 @@ RUN tar -xvf mitlm-0.4.1.tar.gz
 
 WORKDIR $JASPER_HOME/openfst-1.5.0/
 RUN ./configure --enable-compact-fsts --enable-const-fsts --enable-far --enable-lookahead-fsts --enable-pdt
-RUN make -j $THREADS
-RUN make install
+RUN make -j $THREADS 
+RUN make install && ldconfig
 
 WORKDIR $JASPER_HOME/m2m-aligner-1.2/
 RUN make -j $THREADS 
@@ -73,14 +83,15 @@ RUN wget https://github.com/danielchalef/Phonetisaurus/archive/04242015.tar.gz #
 RUN tar -xvf 04242015.tar.gz
 WORKDIR $JASPER_HOME/Phonetisaurus-04242015/src/
 RUN make -j $THREADS
+RUN make install && ldconfig
 
 WORKDIR $JASPER_HOME
 RUN cp m2m-aligner-1.2/m2m-aligner /usr/local/bin/m2m-aligner
-RUN cp 04242015/phonetisaurus-g2p /usr/local/bin/phonetisaurus-g2p
+#RUN cp 04242015/phonetisaurus-g2p /usr/local/bin/phonetisaurus-g2p
 
 WORKDIR $JASPER_HOME
-RUN wget http://phonetisaurus.googlecode.com/files/g014b2b.tgz
-RUN tar -xvf g014b2b.tgz
+RUN wget https://www.dropbox.com/s/kfht75czdwucni1/g014b2b.tgz?dl=0
+RUN tar -xvf g014b2b.tgz\?dl\=0 
 RUN cd g014b2b/ && ./compile-fst.sh
 RUN mv g014b2b phonetisaurus
 
