@@ -40,6 +40,7 @@ RUN echo "/opt/OpenBLAS/lib" > /etc/ld.so.conf.d/openblas.conf && ldconfig
 RUN ln -s /opt/OpenBLAS/lib/libopenblas.so /usr/local/lib/libopenblas.so
 
 # Build Python numpy. It will find OpenBLAS in /usr/local/lib and use for BLAS operations
+RUN pip install --upgrade setuptools
 RUN easy_install -U pip
 RUN pip install numpy
 
@@ -47,7 +48,6 @@ RUN echo "options snd-usb-audio index=0" >> /etc/modprobe.d/alsa-base.conf
 
 RUN git clone https://github.com/jasperproject/jasper-client.git $JASPER_HOME
 
-RUN pip install --upgrade setuptools
 RUN pip install -r $JASPER_HOME/client/requirements.txt
 RUN chmod +x $JASPER_HOME/jasper.py
 
