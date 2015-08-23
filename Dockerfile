@@ -13,10 +13,10 @@ RUN export CPPFLAGS="-mtune=cortex-a7 -mfpu=neon-vfpv4"
 RUN apt-get update; apt-get upgrade -y
 
 RUN apt-get install -y \
-	wget vim git-core python-dev python-pip apt-build\
+	build-essential gcc-4.9 wget vim git-core python-dev python-pip apt-build\
 	bison libasound2-dev libportaudio-dev python-pyaudio \
 	apt-utils alsa-base alsa-utils alsa-oss pulseaudio \
-	subversion autoconf libtool automake gfortran g++
+	subversion autoconf libtool automake gfortran
 
 # Optimised apt-build config which we'll use to compile OpenBLAS
 RUN echo \
@@ -24,9 +24,11 @@ $'build-dir = /var/cache/apt-build/build \n\
 repository-dir = /var/cache/apt-build/repository \n\
 Olevel = -O3 \n\
 mtune = -mtune=cortex-a7 \n\
-options = "" \n\
+options = " " \n\
 make_options = " -j8 -mfpu=neon-vfpv4"' \
 > /etc/apt/apt-build.conf
+
+RUN cat /etc/apt/apt-build.conf
 
 RUN TARGET=ARMV7 apt-build install openblas
 
@@ -46,15 +48,15 @@ WORKDIR $JASPER_HOME
 RUN svn co https://svn.code.sf.net/p/cmusphinx/code/trunk/cmuclmtk/
 RUN cd cmuclmtk; sh ./autogen.sh && make -j $THREADS && make install
 
-RUN wget http://distfiles.macports.org/openfst/openfst-1.3.3.tar.gz
+RUN wget http://www.openfst.org/twiki/pub/FST/FstDownload/openfst-1.5.0.tar.gz
 RUN wget https://mitlm.googlecode.com/files/mitlm-0.4.1.tar.gz
 RUN wget https://m2m-aligner.googlecode.com/files/m2m-aligner-1.2.tar.gz
 
 RUN tar -xvf m2m-aligner-1.2.tar.gz
-RUN tar -xvf openfst-1.3.3.tar.gz
+RUN tar -xvf openfst-1.5.0.tar.gz
 RUN tar -xvf mitlm-0.4.1.tar.gz
 
-WORKDIR $JASPER_HOME/openfst-1.3.3/
+WORKDIR $JASPER_HOME/openfst-1.5.0/
 RUN ./configure --enable-compact-fsts --enable-const-fsts --enable-far --enable-lookahead-fsts --enable-pdt
 RUN make -j $THREADS
 RUN make install
@@ -66,11 +68,9 @@ WORKDIR $JASPER_HOME/mitlm-0.4.1/
 RUN ./configure
 RUN make -j $THREADS
 
+WORKDIR $JASPER_HOME
 RUN wget https://github.com/danielchalef/Phonetisaurus/archive/04242015.tar.gz # rescued from github repo prior to code disappearing?!?
 RUN tar -xvf 04242015.tar.gz
-RUN pwd
-RUN ls -al
-RUN ls -al $JASPER_HOME/Phonetisaurus-04242015/src/
 WORKDIR $JASPER_HOME/Phonetisaurus-04242015/src/
 RUN make -j $THREADS
 
