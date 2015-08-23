@@ -9,14 +9,19 @@ RUN export THREADS=`getconf _NPROCESSORS_ONLN`
 
 RUN export CCFLAGS="-mtune=cortex-a7 -mfpu=neon-vfpv4"; export CPPFLAGS="-mtune=cortex-a7 -mfpu=neon-vfpv4"
 
+RUN apt-get install software-properties-common
+# multiverse is needed for libttspico
+RUN apt-add-repository -y multiverse && apt-get update
+
 RUN apt-get update; apt-get upgrade -y
 
 RUN apt-get install -y \
-	build-essential wget vim git-core python-dev\
+	build-essential wget vim git-core python-dev \
 	bison libasound2-dev libportaudio-dev python-pyaudio \
 	apt-utils alsa-base alsa-utils alsa-oss pulseaudio \
 	subversion autoconf libtool automake gfortran
 
+RUN git clone https://github.com/jasperproject/jasper-client.git $JASPER_HOME
 
 # Optimised apt-build config which we'll use to compile OpenBLAS
 #RUN echo \
@@ -46,7 +51,6 @@ RUN pip install numpy
 
 RUN echo "options snd-usb-audio index=0" >> /etc/modprobe.d/alsa-base.conf
 
-RUN git clone https://github.com/jasperproject/jasper-client.git $JASPER_HOME
 
 RUN pip install -r $JASPER_HOME/client/requirements.txt
 RUN chmod +x $JASPER_HOME/jasper.py
@@ -97,4 +101,4 @@ RUN cd g014b2b/ && ./compile-fst.sh
 RUN mv g014b2b phonetisaurus
 
 # Install deps for SVOX Pico TTS engine
-RUN apt-get install libttspico-utils
+RUN apt-get install -y libttspico-utils
