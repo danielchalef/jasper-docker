@@ -17,7 +17,6 @@ RUN apt-get install -y \
 	apt-utils alsa-base alsa-utils alsa-oss pulseaudio \
 	subversion autoconf libtool automake gfortran
 
-RUN easy_install -U pip
 
 # Optimised apt-build config which we'll use to compile OpenBLAS
 #RUN echo \
@@ -38,8 +37,10 @@ WORKDIR $JASPER_HOME/OpenBLAS
 RUN git checkout v0.2.14
 RUN make -j $THREADS TARGET=ARMV7 && make install
 RUN echo "/opt/OpenBLAS/lib" > /etc/ld.so.conf.d/openblas.conf && ldconfig
+RUN ln -s /opt/OpenBLAS/lib/libopenblas.so /usr/local/lib/libopenblas.so
 
-# Build Python numpy and now use OpenBLAS for BLAS operations
+# Build Python numpy. It will find OpenBLAS in /usr/local/lib and use for BLAS operations
+RUN easy_install -U pip
 RUN pip install numpy
 
 RUN echo "options snd-usb-audio index=0" >> /etc/modprobe.d/alsa-base.conf
