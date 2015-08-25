@@ -56,7 +56,7 @@ RUN pip install -r $JASPER_HOME/client/requirements.txt
 RUN chmod +x $JASPER_HOME/jasper.py
 
 # Install PocketSphinx and Deps
-RUN apt-get install -y pocketsphinx-utils
+RUN apt-get install -y pocketsphinx-utils pocketsphinx-lm-en-hub4
 
 WORKDIR $JASPER_HOME
 
