@@ -21,7 +21,8 @@ $ docker build -t jasper-docker .
 ###### and then run the image:
 Jasper needs access to your sound devices, which requires sharing the host's devices with your docker container. See **Gotchas** below on how to determine the correct devices for your setup.
 ```bash
-$ docker run -ti --privileged -v /dev/snd/pcmC0D0p:/dev/snd/pcmC0D0p \
+$ docker run -ti --privileged \
+      -v /dev/snd/pcmC0D0p:/dev/snd/pcmC0D0p \
       -v /dev/snd/pcmC1D0c:/dev/snd/pcmC1D0c \
       -v /dev/snd/controlC0:/dev/snd/controlC0 \
       -v /dev/snd/controlC1:/dev/snd/controlC1 \
