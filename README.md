@@ -9,6 +9,7 @@
 
 ###### Just pull the image from Docker Hub
 The easiest and fastest way to get Jasper is to download a prebuilt image:
+
 ```docker pull danielchalef/armhf-ubuntu-core```
 
 ###### Or compile your own image as follows:
