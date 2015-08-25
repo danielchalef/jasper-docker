@@ -46,4 +46,13 @@ Where source code has been compiled, the `gcc` optimization flags `-mtune=cortex
 Dependencies for Google TTS and STT have been installed. If you'd like to use other services / apps, please see the Jasper website for required dependencies and configuration. *Importantly, since you're using Ubuntu, you should be able to find many of the dependencies are already available as deb packages and will not need to manually compile them from source.*
 
 ##### Things that tripped me up, and may do the same to you
+Getting Jasper using the right sound devices was a real PITA
+
+To get TTS working (if Jasper is silent), you may need to change the ALSA device Jasper uses for TTS. Unfortunately this can only be done by modifying the source code:
+
+File `client/tts.py` line number `76`
+
+```python
+cmd = ['aplay', '-D', 'plughw:0,0', str(filename)]
+```
 
