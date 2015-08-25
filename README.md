@@ -10,7 +10,7 @@
 ###### Just pull the image from Docker Hub
 The easiest and fastest way to get Jasper is to download a prebuilt image:
 
-```docker pull danielchalef/armhf-ubuntu-core```
+```docker pull danielchalef/armhf-jasper-docker```
 
 ###### Or compile your own image as follows:
 ```bash
@@ -33,7 +33,7 @@ You will need to configure Jasper per the Jasper website. This includes running 
 ###### Using this image for your own app
 If you'd like to use this image as a base for your own Jasper-based apps, make the first line of your custom Dockerfile:
 ```
-FROM danielchalef/jasper-docker:latest
+FROM danielchalef/armhf-jasper-docker:latest
 ```
 
 ##### Why Ubuntu?
