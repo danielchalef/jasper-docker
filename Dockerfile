@@ -11,7 +11,7 @@ RUN export CCFLAGS="-mtune=cortex-a7 -mfpu=neon-vfpv4"; export CPPFLAGS="-mtune=
 
 RUN apt-get install -y software-properties-common
 # multiverse is needed for libttspico
-RUN apt-add-repository -y multiverse && apt-get update
+RUN apt-add-repository -y multiverse 
 
 RUN apt-get update; apt-get upgrade -y
 
@@ -19,7 +19,8 @@ RUN apt-get install -y \
 	build-essential wget vim git-core python-dev \
 	bison libasound2-dev libportaudio-dev python-pyaudio \
 	apt-utils alsa-base alsa-utils alsa-oss pulseaudio \
-	subversion autoconf libtool automake gfortran
+	subversion autoconf libtool automake gfortran \ 
+	python-pymad libttspico-utils
 
 RUN git clone https://github.com/jasperproject/jasper-client.git $JASPER_HOME
 
@@ -42,5 +43,5 @@ RUN echo "options snd-usb-audio index=0" >> /etc/modprobe.d/alsa-base.conf
 RUN pip install -r $JASPER_HOME/client/requirements.txt
 RUN chmod +x $JASPER_HOME/jasper.py
 
-# Install deps for SVOX Pico TTS engine
-RUN apt-get install -y libttspico-utils
+# Install deps for Google TTS
+RUN pip install --upgrade gTTS
