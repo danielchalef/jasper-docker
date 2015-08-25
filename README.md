@@ -50,8 +50,12 @@ Where source code has been compiled, the `gcc` optimization flags `-mtune=cortex
 Dependencies for Google TTS and STT have been installed. If you'd like to use other services / apps, please see the Jasper website for required dependencies and configuration. *Importantly, since you're using Ubuntu, you should be able to find many of the dependencies are already available as deb packages and will not need to manually compile them from source.*
 
 ##### Things that tripped me up, and may do the same to you
-Getting Jasper using the right sound devices was a real PITA. It's likely you will be using a USB microphone, and either USB speakers or the `local` 3.5mm jack. Unfortunately the ALSA device numbers may vary, and you'll need to tell ALSA how to expose them (and possibly hack Jasper in order for it to find your audio output - see below).
+Getting Jasper using the right sound devices was a real PITA. It's likely you will be using a USB microphone, and either USB speakers or the `local` 3.5mm jack. Unfortunately the ALSA device numbers may vary, and you'll need to tell ALSA how to expose them (and possibly hack Jasper source code in order for it to find your audio output - see below).
 
+###### Unmuting your microphone
+Firstly, ensure that your mike is unmuted. You can use `alsamixer` for this.
+
+###### Ensure ALSA is configured with the right default devices
 Determine the location of your sound devices:
 - Input devices
 ```bash
@@ -79,8 +83,22 @@ card 0: ALSA [bcm2835 ALSA], device 1: bcm2835 ALSA [bcm2835 IEC958/HDMI]
   Subdevice #0: subdevice #0
 ```
 
-Note the `card` and `device` numbers. Now we'll need to tell ALSA which devices to use as defaults.
+Note the `card` and `device` numbers. Now we'll need to tell ALSA which devices to use as defaults. Create either a  `~/.asoundrc` or `/etc/asound.conf` file with the contents below. For more on ALSA config files: http://alsa.opensrc.org/Asoundrc
 
+```c++
+ pcm.!default {
+         type asym
+         playback.pcm {
+                 type plug
+                 slave.pcm "hw:0,0"
+         }
+         capture.pcm {
+                 type plug
+                 slave.pcm "hw:1,0"
+         } 
+ }
+```
+###### Ensure Jasper is using the right output device
 To get TTS working (if Jasper is silent), you may need to change the ALSA device Jasper uses for TTS. Unfortunately this can only be done by modifying the source code:
 
 File `client/tts.py` line number `76`
