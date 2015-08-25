@@ -19,7 +19,7 @@ $ cd jasper-docker
 $ docker build -t jasper-docker .
 ```
 ###### and then run the image:
-Jasper needs access to your sound devices, which requires sharing the host's devices with your docker container.  Note that the `C` and `D` in the device names below mean Card and Device respectively. See **Gotchas/Default devices** below on how to determine the correct PCM devices to share.
+Jasper needs access to your sound devices, which requires sharing the host's devices with your docker container.  Note that the `C` and `D` in the device names below mean *Card* and *Device* respectively. See **Gotchas/Default devices** below on how to determine the correct PCM devices to share.
 ```bash
 $ docker run -ti --privileged \
       -v /dev/snd/pcmC0D0p:/dev/snd/pcmC0D0p \
