@@ -50,7 +50,36 @@ Where source code has been compiled, the `gcc` optimization flags `-mtune=cortex
 Dependencies for Google TTS and STT have been installed. If you'd like to use other services / apps, please see the Jasper website for required dependencies and configuration. *Importantly, since you're using Ubuntu, you should be able to find many of the dependencies are already available as deb packages and will not need to manually compile them from source.*
 
 ##### Things that tripped me up, and may do the same to you
-Getting Jasper using the right sound devices was a real PITA. 
+Getting Jasper using the right sound devices was a real PITA. It's likely you will be using a USB microphone, and either USB speakers or the `local` 3.5mm jack. Unfortunately the ALSA device numbers may vary, and you'll need to tell ALSA how to expose them (and possibly hack Jasper in order for it to find your audio output - see below).
+
+Determine the location of your sound devices:
+- Input devices
+```bash
+$ arecord -l
+card 1: Device [USB PnP Sound Device], device 0: USB Audio [USB Audio]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+```
+- Output devices
+```bash
+$ aplay -l
+**** List of PLAYBACK Hardware Devices ****
+card 0: ALSA [bcm2835 ALSA], device 0: bcm2835 ALSA [bcm2835 ALSA]
+  Subdevices: 8/8
+  Subdevice #0: subdevice #0
+  Subdevice #1: subdevice #1
+  Subdevice #2: subdevice #2
+  Subdevice #3: subdevice #3
+  Subdevice #4: subdevice #4
+  Subdevice #5: subdevice #5
+  Subdevice #6: subdevice #6
+  Subdevice #7: subdevice #7
+card 0: ALSA [bcm2835 ALSA], device 1: bcm2835 ALSA [bcm2835 IEC958/HDMI]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+```
+
+Note the `card` and `device` numbers. Now we'll need to tell ALSA which devices to use as defaults.
 
 To get TTS working (if Jasper is silent), you may need to change the ALSA device Jasper uses for TTS. Unfortunately this can only be done by modifying the source code:
 
