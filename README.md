@@ -12,7 +12,7 @@ The easiest and fastest way to get Jasper is to download a prebuilt image:
 
 ```docker pull danielchalef/armhf-jasper-docker```
 
-###### Or compile your own image as follows:
+###### Or build your own image as follows:
 ```bash
 $ git clone https://github.com/danielchalef/jasper-docker.git
 $ cd jasper-docker
